@@ -8,6 +8,7 @@ export const loginGetController = (req, res) => {
 
 export const homeGetController = (req, res) => {
   if (req?.workSpace?._id) {
+    console.log(req.wordSpace);
     return res.render("workSpacePublic", req.wordSpace);
   }
   res.render("index");

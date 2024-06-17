@@ -11,8 +11,8 @@ export const homeGetController = (req, res) => {
   console.log("req?.workSpace?._id", req?.workSpace?._id);
 
   if (req?.workSpace?._id) {
-    console.log(req.wordSpace);
-    return res.render("workSpacePublic", req.wordSpace);
+    console.log(req.workSpace);
+    return res.render("workSpacePublic", req.workSpace);
   }
   res.render("index");
 };

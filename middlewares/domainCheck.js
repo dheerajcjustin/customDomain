@@ -18,11 +18,14 @@ export const checkCustomDomain = async (req, res, next) => {
     workSpace = await WorkSpace.findOne({ domain: currentDomain });
   }
 
+  console.log("with word space", workSpace);
+
   if (workSpace?._id) {
     req.workSpace = workSpace;
 
     next();
   } else if (isCurrentDomainAndMainSame) {
+    console.log("is the main domain ");
     next();
   } else {
     res.status(404).send("not found");

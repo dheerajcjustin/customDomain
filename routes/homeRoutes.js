@@ -25,7 +25,7 @@ homeRouter.post("/workSpace/subDomain/:workSpaceId", updateSubDomain);
 
 homeRouter.get("/workSpace/domain/:workSpaceId", getDomainController);
 
-homeRouter.post("/workSpace/domain/update/:wordSpaceId", changeDomianPost);
+homeRouter.post("/workSpace/domain/update/:workSpaceId", changeDomianPost);
 
 homeRouter.get("/", checkCustomDomain, homeGetController);
 

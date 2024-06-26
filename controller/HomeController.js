@@ -1,5 +1,5 @@
 import WorkSpace from "../models/workSpace.js";
-import { Adddomain, verifyDomainMapping } from "../services/addDomain.js";
+import { addDomain, verifyDomainMapping } from "../services/addDomain.js";
 const mainHost = process.env.domainName;
 
 export const loginGetController = (req, res) => {
@@ -70,7 +70,7 @@ export const changeDomianPost = async (req, res) => {
     console.log("req. body ", req.body);
     const isMappedToOurIP = await verifyDomainMapping(domainName);
     if (!isMappedToOurIP) return res.send("verification failed");
-    const domain = await Adddomain(domainName);
+    const domain = await addDomain(domainName);
     const wordSpace = await WorkSpace.findByIdAndUpdate(
       workSpaceId,
       {

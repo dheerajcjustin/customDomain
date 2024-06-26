@@ -1,3 +1,4 @@
+import fs from "fs/promises";
 import path from "path";
 import util from "util";
 import { exec as execCallback } from "child_process";
@@ -6,13 +7,13 @@ import dns from "dns/promises";
 const exec = util.promisify(execCallback);
 
 const sitesEnabledPath = "/etc/nginx/sites-enabled";
-const sitesAvailabelPath = "/etc/nginx/sites-available";
+const sitesAvailablePath = "/etc/nginx/sites-available";
 
-export async function Adddomain(domainName) {
+export async function addDomain(domainName) {
   try {
     await checkIfRootUser();
     await ensureDirectoryExists(sitesEnabledPath);
-    await ensureDirectoryExists(sitesAvailabelPath);
+    await ensureDirectoryExists(sitesAvailablePath);
     await createNginxConfig(domainName);
     await reloadNginx();
     await createSSLCertificate(domainName);
@@ -51,13 +52,16 @@ async function createNginxConfig(domainName) {
         }
     }`;
 
-  const sitesAvailabeldomainPath = path.join(sitesAvailabelPath, domainName);
+  const sitesAvailableDomainPath = path.join(sitesAvailablePath, domainName);
   const sitesEnabledDomainPath = path.join(sitesEnabledPath, domainName);
 
   try {
-    await fs.writeFile(sitesAvailabeldomainPath, configContent);
-    await createSymbolicLink(sitesAvailabeldomainPath, sitesEnabledDomainPath);
-    console.log("Nginx config file created successfully at:", filePath);
+    await fs.writeFile(sitesAvailableDomainPath, configContent);
+    await createSymbolicLink(sitesAvailableDomainPath, sitesEnabledDomainPath);
+    console.log(
+      "Nginx config file created successfully at:",
+      sitesAvailableDomainPath
+    );
   } catch (err) {
     console.error("Error writing Nginx config file:", err.message);
     throw new Error(err.message);
@@ -82,8 +86,6 @@ async function createSSLCertificate(domainName) {
     const { stdout, stderr } = await exec(
       `sudo certbot --nginx -d ${domainName}`
     );
-    if (stdout) {
-    }
     console.log("SSL certificate creation stdout:", stdout);
     if (stderr) {
       console.log("stderr: error while creating SSL certificate", stderr);
@@ -110,13 +112,11 @@ async function createSymbolicLink(target, destination) {
 
 export async function verifyDomainMapping(domain, expectedIp = "34.125.77.53") {
   try {
-    // Perform DNS lookup
     const addresses = await dns.lookup(domain, { all: true });
     const ipAddresses = addresses.map((addr) => addr.address);
 
     console.log(`Domain ${domain} resolves to IPs: ${ipAddresses.join(", ")}`);
 
-    // Check if the expected IP is in the list of resolved IPs
     if (ipAddresses.includes(expectedIp)) {
       console.log(`Domain ${domain} is correctly mapped to ${expectedIp}`);
       return true;
